@@ -1,10 +1,7 @@
 package com.luv2code.junitdemo;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static java.util.List.*;
 
 public class DemoUtils {
 
