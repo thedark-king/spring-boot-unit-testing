@@ -1,11 +1,13 @@
 package com.luv2code.junitdemo;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import java.util.Arrays;
 import java.util.List;
 
-import static java.util.List.*;
-
+@TestMethodOrder(MethodOrderer.Random.class) //Running test methods randomly
+//@TestMethodOrder(MethodOrderer.MethodName.class) //Running tests methods based on alphabetic order
 public class DemoUtils {
 
     private String academy = "Luv2Code Academy";
