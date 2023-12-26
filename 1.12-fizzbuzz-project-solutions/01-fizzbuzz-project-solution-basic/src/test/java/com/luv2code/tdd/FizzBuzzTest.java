@@ -67,6 +67,7 @@ class FizzBuzzTest {
 
         assertEquals(expected, FizzBuzz.compute(value));
     }
+
     @DisplayName("Testing with small data file")
     @ParameterizedTest(name = "value={0}, expected={1}")
     @CsvFileSource(resources = "/large-test-data.csv")
