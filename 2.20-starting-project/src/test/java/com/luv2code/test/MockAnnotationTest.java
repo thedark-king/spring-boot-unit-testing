@@ -8,13 +8,15 @@ import com.luv2code.component.service.ApplicationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,10 +33,10 @@ public class MockAnnotationTest {
     @Autowired
     StudentGrades studentGrades;
 
-    @Mock
+    @MockBean
     private ApplicationDao mockApplicationDao;
 
-    @InjectMocks
+    @Autowired
     private ApplicationService mockApplicationService;
 
 
@@ -57,5 +59,41 @@ public class MockAnnotationTest {
         verify(mockApplicationDao, times(1)).addGradeResultsForSingleClass(studentGrades.getMathGradeResults());
     }
 
+    @DisplayName("Find gap")
+    @Test
+    public void assertEqualsTestFindGap() {
+        when(mockApplicationDao.findGradePointAverage(studentGrades.getMathGradeResults())).thenReturn(88.31);
+        assertEquals(88.31, mockApplicationService.findGradePointAverage(studentOne.getStudentGrades().getMathGradeResults()));
+    }
+
+    @DisplayName("Not Null")
+    @Test
+    public void testAssertNotNull() {
+        when(mockApplicationDao.checkNull(studentGrades.getMathGradeResults())).thenReturn(true);
+        assertNotNull(mockApplicationService.checkNull(studentOne.getStudentGrades().getMathGradeResults()));
+    }
+
+    @DisplayName("Throw runtime exception")
+    @Test
+    public void throwRuntimeException() {
+        CollegeStudent nullStudent = (CollegeStudent) context.getBean("collegeStudent");
+        doThrow(new RuntimeException()).when(mockApplicationService).checkNull(nullStudent);
+        assertThrows(RuntimeException.class, () -> {mockApplicationService.checkNull(nullStudent);});
+        verify(mockApplicationService, times(1)).checkNull(nullStudent);
+    }
+
+
+    @DisplayName("Multiple Stubbing")
+    @Test
+    public void stubbingConsecutiveCalls() {
+        CollegeStudent nullStudent = (CollegeStudent) context.getBean("collegeStudent");
+
+        when(mockApplicationDao.checkNull(nullStudent)).thenThrow(new RuntimeException()).thenReturn("Do not throw exception second time");
+
+        assertThrows(RuntimeException.class, () -> mockApplicationService.checkNull(nullStudent));
+        assertEquals("Do not throw exception second time", mockApplicationService.checkNull(nullStudent));
+
+        verify(mockApplicationDao, times(2)).checkNull(nullStudent);
+    }
 
 }
